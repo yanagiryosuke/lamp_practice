@@ -19,7 +19,15 @@ if(is_admin($user) === false){
 }
 
 $item_id = get_post('item_id');
+$token = get_post('token');
 
+if(is_valid_csrf_token($token)) {
+  unset($_SESSION['csrf_token']);
+} else {
+  set_error('外部から攻撃を受けました。ログアウトしてください。');
+  unset($_SESSION['csrf_token']);
+  redirect_to(ADMIN_URL);
+}
 
 if(destroy_item($db, $item_id) === true){
   set_message('商品を削除しました。');

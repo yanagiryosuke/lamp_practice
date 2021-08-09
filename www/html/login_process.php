@@ -11,9 +11,17 @@ if(is_logined() === true){
 
 $name = get_post('name');
 $password = get_post('password');
+$token = get_post('token');
 
 $db = get_db_connect();
 
+if(is_valid_csrf_token($token)) {
+  unset($_SESSION['csrf_token']);
+} else {
+  set_error('外部から攻撃を受けました。');
+  unset($_SESSION['csrf_token']);
+  redirect_to(LOGIN_URL);
+}
 
 $user = login_as($db, $name, $password);
 if( $user === false){
