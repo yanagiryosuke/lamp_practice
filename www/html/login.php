@@ -10,4 +10,5 @@ if(is_logined() === true){
 
 $token = get_csrf_token();
 
+header('X-FRAME-OPTIONS: DENY');
 include_once VIEW_PATH . 'login_view.php';

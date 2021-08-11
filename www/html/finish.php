@@ -32,4 +32,5 @@ if(purchase_carts($db, $carts) === false){
 
 $total_price = sum_carts($carts);
 
+header('X-FRAME-OPTIONS: DENY');
 include_once '../view/finish_view.php';

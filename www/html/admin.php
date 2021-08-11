@@ -21,4 +21,6 @@ if(is_admin($user) === false){
 }
 
 $items = get_all_items($db);
+
+header('X-FRAME-OPTIONS: DENY');
 include_once VIEW_PATH . '/admin_view.php';
