@@ -15,6 +15,15 @@ $db = get_db_connect();
 $user = get_login_user($db);
 
 $carts = get_user_carts($db, $user['user_id']);
+$token = get_post('token');
+
+if(is_valid_csrf_token($token)) {
+  unset($_SESSION['csrf_token']);
+} else {
+  set_error('外部から攻撃を受けました。ログアウトしてください。');
+  unset($_SESSION['csrf_token']);
+  redirect_to(CART_URL);
+}
 
 if(purchase_carts($db, $carts) === false){
   set_error('商品が購入できませんでした。');
@@ -23,4 +32,5 @@ if(purchase_carts($db, $carts) === false){
 
 $total_price = sum_carts($carts);
 
+header('X-FRAME-OPTIONS: DENY');
 include_once '../view/finish_view.php';

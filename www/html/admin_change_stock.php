@@ -20,6 +20,15 @@ if(is_admin($user) === false){
 
 $item_id = get_post('item_id');
 $stock = get_post('stock');
+$token = get_post('token');
+
+if(is_valid_csrf_token($token)) {
+  unset($_SESSION['csrf_token']);
+} else {
+  set_error('外部から攻撃を受けました。ログアウトしてください。');
+  unset($_SESSION['csrf_token']);
+  redirect_to(ADMIN_URL);
+}
 
 if(update_item_stock($db, $item_id, $stock)){
   set_message('在庫数を変更しました。');

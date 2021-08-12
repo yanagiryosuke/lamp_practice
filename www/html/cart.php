@@ -18,4 +18,7 @@ $carts = get_user_carts($db, $user['user_id']);
 
 $total_price = sum_carts($carts);
 
+$token = get_csrf_token();
+
+header('X-FRAME-OPTIONS: DENY');
 include_once VIEW_PATH . 'cart_view.php';
