@@ -20,10 +20,8 @@ $token = get_csrf_token();
 if(is_admin($user)){
     $histories = get_histories($db);
 }else{
-    $histories = get_history($db, $user['user_id']);
+    $histories = get_histories($db, $user['user_id']);
 }
-
-$histories = add_history_total_price($db, $histories);
 
 header('X-FRAME-OPTIONS: DENY');
 include_once '../view/history_view.php';
