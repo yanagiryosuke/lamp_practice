@@ -5,8 +5,6 @@
         <title>購入履歴</title>
     </head>
     <body>
-        <?php var_dump($histories); ?>
-        <?php var_dump($details); ?>
         <?php include VIEW_PATH . 'templates/header_logined.php'; ?>
         <h1>購入履歴</h1>
         <div class="container">

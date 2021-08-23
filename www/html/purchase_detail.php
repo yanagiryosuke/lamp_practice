@@ -34,7 +34,8 @@ if(is_admin($user)){
     $details = get_detail_by_purchase_id($db, $purchase_id);
 }
 
-$total_price = total_price($details);
+$histories = add_history_total_price($db, $histories);
+$details = add_detail_total_price($db, $details);
 
 header('X-FRAME-OPTIONS: DENY');
 include_once '../view/purchase_detail_view.php';

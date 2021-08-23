@@ -30,7 +30,7 @@ function get_history_by_purchase_id($db, $purchase_id) {
             purchase_id = :purchase_id
     ";
     $params = array(':purchase_id' => $purchase_id);
-    return fetch_query($db, $sql, $params);
+    return fetch_all_query($db, $sql, $params);
 }
 
 function get_histories($db) {
@@ -68,6 +68,7 @@ function get_detail($db, $histories) {
 function get_detail_by_purchase_id($db, $purchase_id) {
     $sql = "
         SELECT
+            detail_id,
             purchase_id,
             item_name,
             item_price,
@@ -140,48 +141,57 @@ function insert_purchase($db, $user_id, $carts) {
     return false;
 }
 
-function detail_total_price($details){
-    $total_price = array();
-    foreach($details as $detail){
-        $total_price[] = $detail['item_price'] * $detail['item_amount'];
-    }
+function history_total_price($db){
+    $sql = "
+        SELECT
+            purchase_id,
+            SUM(item_price * item_amount) AS total_price
+        FROM
+            purchase_details
+        GROUP BY
+            purchase_id;
+    ";
+    $total_price = fetch_all_query($db, $sql);
     return $total_price;
 }
 
-function add_history_total_price($details, $histories){
+function detail_total_price($db){
+    $sql = "
+        SELECT
+            detail_id,
+            purchase_id,
+            SUM(item_price * item_amount) AS total_price
+        FROM
+            purchase_details
+        GROUP BY
+            detail_id;
+    ";
+    $total_price = fetch_all_query($db, $sql);
+    return $total_price;
+}
+
+function add_history_total_price($db, $histories){
+    $total_price = history_total_price($db);
     foreach($histories as &$history){
-        $price = 0;
-        foreach($details as $detail){
-            foreach($detail as $det){
-                if($history['purchase_id'] === $det['purchase_id']){
-                    $price += $det['item_price'] * $det['item_amount'];
-                }
+        foreach($total_price as $price){
+            if($history['purchase_id'] === $price['purchase_id']){
+                $history['total_price'] = $price['total_price'];
             }
         }
-        $history['total_price'] = $price;
     }
     unset($history);
     return $histories;
 }
 
-function add_history_total_price_admin($details, $histories){
-    foreach($histories as &$history){
-        $price = 0;
-        foreach($details as $detail){
-            if($history['purchase_id'] === $detail['purchase_id']){
-                $price += $detail['item_price'] * $detail['item_amount'];
+function add_detail_total_price($db, $details){
+    $total_price = detail_total_price($db);
+    foreach($details as &$detail){
+        foreach($total_price as $price){
+            if($detail['detail_id'] === $price['detail_id']){
+                $detail['total_price'] = $price['total_price'];
             }
         }
-        $history['total_price'] = $price;
     }
-    unset($history);
-    return $histories;
-}
-
-function total_price($details){
-    $total_price = 0;
-    foreach($details as $detail){
-        $total_price += $detail['item_price'] * $detail['item_amount'];
-    }
-    return $total_price;
+    unset($detail);
+    return $details;
 }
