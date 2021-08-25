@@ -51,6 +51,33 @@ function get_open_items($db){
   return get_items($db, true);
 }
 
+function get_ranking_items($db){
+  $sql = "
+    SELECT
+      items.item_id,
+      items.name,
+      stock,
+      items.price,
+      image,
+      status,
+      SUM(purchase_details.item_amount) AS purchased_amount 
+    FROM
+      items
+    JOIN
+      purchase_details
+    ON
+      items.item_id = purchase_details.item_id
+    WHERE
+      status = 1
+    GROUP BY
+      purchase_details.item_id
+    ORDER BY
+      purchased_amount DESC
+    LIMIT 3
+  ";
+  return fetch_all_query($db, $sql);
+}
+
 function regist_item($db, $name, $price, $stock, $status, $image){
   $filename = get_upload_filename($image);
   if(validate_item($name, $price, $stock, $filename, $status) === false){
